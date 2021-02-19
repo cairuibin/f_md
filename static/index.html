@@ -4,35 +4,81 @@
 <head>
     <meta charset="utf-8" />
     <title>blog_c</title>
-    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.js"></script>
-
     <link rel="stylesheet" href="./heightlight/styles/atelier-lakeside-dark.css">
     <link href="./heightlight/prism.css" rel="stylesheet">
+    <script src="./js/axios.js"></script>
+    <script src="./js/vue.js"></script>
     <style>
-        #content{
+        #content {
             max-width: 960px;
             margin: auto;
         }
-        .hljs{
-            background:#000;
+img{
+    max-width: 100%;
+    max-height: 100%;
+}
+        .hljs {
+            /* background: #000; */
+            padding: 1.5rem;
+            border-radius: 4px;
         }
     </style>
 </head>
 
 <body>
-    <div id="content"> </div>
+
+  <img src="./upload/下载 (1).png" alt="">
+
+    <div id="app">
+        <input type="file" ref='fileElem'  accept="*" style="display:none" @change="handleFiles">
+        <button @click='selectFile'>选择文件</button>
+        <div id="content" ref='content' v-html="htmlData"> </div>
+
+    </div>
     <script>
-       function addClassInPre(){
-          document.querySelectorAll('#content pre').forEach(v=>{
-              v.classList.add('hljs')
-          })
-       };
-        window.onload = () => {
-            axios.get('/uu').then((r) => {
-                content.innerHTML = r.data
-                addClassInPre()
-            })
-        }
+        new Vue({
+            el: "#app",
+            data: {
+                htmlData: ""
+            },
+            created() {
+                this.getHtml()
+            },
+            methods: {
+                async getHtml() {
+                    const { data } = await axios.get('/html');
+                    this.htmlData = await data.replace(/<pre>/g, '<pre class="hljs">');
+                },
+                selectFile() {
+                    this.$refs.fileElem.click()
+                },
+
+                handleFiles(e) {
+                    const files = e.target.files
+                    console.log(files);
+
+                    this.FileUpload(files[0])
+                },
+
+               async FileUpload(file) {
+                        const uri = "/FileUpload";
+     
+                        const fd = new FormData();
+                        fd.append('file', file);
+                     
+                        // console.log(file,'1111',fd.get('file'),fd.get('aaa'))
+
+          
+                      const res=await  axios.post(uri,fd,{
+                          headers:{
+                              'Content-Type':"application/x-www-form-urlencoded"
+                          }
+                      })
+                      console.log(res)
+                    
+                }
+            }
+        })
     </script>
 </body>
 
