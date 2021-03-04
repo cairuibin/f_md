@@ -13,36 +13,30 @@
             max-width: 960px;
             margin: auto;
         }
-img{
-    max-width: 100%;
-    max-height: 100%;
-}
+
         .hljs {
-            /* background: #000; */
-            padding: 1.5rem;
-            border-radius: 4px;
+            background: #000;
         }
     </style>
 </head>
 
 <body>
-
-  <img src="./upload/下载 (1).png" alt="">
-
     <div id="app">
-        <input type="file" ref='fileElem'  accept="*" style="display:none" @change="handleFiles">
+        <input type="file" ref='fileElem' accept="*" style="display:none" @change="handleFiles">
         <button @click='selectFile'>选择文件</button>
         <div id="content" ref='content' v-html="htmlData"> </div>
-
+        {{filelist}}
     </div>
     <script>
         new Vue({
             el: "#app",
             data: {
-                htmlData: ""
+                htmlData: "",
+                filelist: []
             },
             created() {
-                this.getHtml()
+                this.getHtml();
+                this.getfilelist()
             },
             methods: {
                 async getHtml() {
@@ -59,23 +53,21 @@ img{
 
                     this.FileUpload(files[0])
                 },
+                async FileUpload(file) {
+                    const uri = "/FileUpload";
+                    const fd = new FormData();
+                    fd.append('file', file);
+                    const res = await axios.post(uri, fd, {
+                        headers: {
+                            'Content-Type': "application/x-www-form-urlencoded"
+                        }
+                    })
+                },
+                async getfilelist() {
+                    const uri = "/filelist";
+                    const res = await axios.post(uri)
 
-               async FileUpload(file) {
-                        const uri = "/FileUpload";
-     
-                        const fd = new FormData();
-                        fd.append('file', file);
-                     
-                        // console.log(file,'1111',fd.get('file'),fd.get('aaa'))
-
-          
-                      const res=await  axios.post(uri,fd,{
-                          headers:{
-                              'Content-Type':"application/x-www-form-urlencoded"
-                          }
-                      })
-                      console.log(res)
-                    
+                    this.filelist = res
                 }
             }
         })
