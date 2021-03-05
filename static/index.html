@@ -8,6 +8,7 @@
     <link href="./heightlight/prism.css" rel="stylesheet">
     <script src="./js/axios.js"></script>
     <script src="./js/vue.js"></script>
+    <script src='./js/vue-router.js'></script>
     <style>
         #content {
             max-width: 960px;
@@ -22,54 +23,47 @@
 
 <body>
     <div id="app">
-        <input type="file" ref='fileElem' accept="*" style="display:none" @change="handleFiles">
-        <button @click='selectFile'>选择文件</button>
-        <div id="content" ref='content' v-html="htmlData"> </div>
-        {{filelist}}
+
+        <router-link to="/">的方法对付</router-link><br>
+        <router-link to="/aa">能够广泛</router-link><br>
+        <router-link to="/bb">东方饭店反对法</router-link><br>
+        <div>
+            <router-view></router-view>
+        </div>
     </div>
+    <script src="../page/main/index.js"></script>
+    <script src="../page/detail/index.js"></script>
     <script>
+
+    </script>
+    <script>
+
+
+        Vue.use(VueRouter)
+        const router = new VueRouter({
+            mode: 'history',
+            routes: [{
+                path: '/',
+                component: __Main
+            }, {
+                path: '/aa',
+                component: __Detail
+
+            }, {
+                path: '/bb',
+                component: __Main
+
+            },{
+                path:'*',
+                component: __Main
+            }]
+        })
+
+        console.log(router)
         new Vue({
             el: "#app",
-            data: {
-                htmlData: "",
-                filelist: []
-            },
-            created() {
-                this.getHtml();
-                this.getfilelist()
-            },
-            methods: {
-                async getHtml() {
-                    const { data } = await axios.get('/html');
-                    this.htmlData = await data.replace(/<pre>/g, '<pre class="hljs">');
-                },
-                selectFile() {
-                    this.$refs.fileElem.click()
-                },
+            router,
 
-                handleFiles(e) {
-                    const files = e.target.files
-                    console.log(files);
-
-                    this.FileUpload(files[0])
-                },
-                async FileUpload(file) {
-                    const uri = "/FileUpload";
-                    const fd = new FormData();
-                    fd.append('file', file);
-                    const res = await axios.post(uri, fd, {
-                        headers: {
-                            'Content-Type': "application/x-www-form-urlencoded"
-                        }
-                    })
-                },
-                async getfilelist() {
-                    const uri = "/filelist";
-                    const res = await axios.post(uri)
-
-                    this.filelist = res
-                }
-            }
         })
     </script>
 </body>

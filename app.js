@@ -1,6 +1,6 @@
 const Koa = require('koa')
 const Router = require('koa-router')
-const koaBody = require('koa-body') //解析上传文件的插件
+const koaBody = require('koa-body')
 const app = new Koa()
 const router = new Router();
 const static = require('koa-static')
@@ -21,7 +21,7 @@ app.use(koaBody({
 
 router.post('/filelist', ctx => {
     const jsonbuffer = fs.readFileSync('./file_json/index.json')
-    const jsonArr= JSON.parse(jsonbuffer)
+    const jsonArr = JSON.parse(jsonbuffer)
 
     ctx.body = JSON.stringify(jsonArr)
 })
@@ -55,15 +55,23 @@ router.post('/FileUpload', async ctx => {
     }
     jsonArr.push(o)
     const stringJson = JSON.stringify(jsonArr)
-    const jsonfile = fs.writeFileSync(path.resolve(__dirname, 'file_json/index.json'), stringJson)
-    // console.log(jsonbufffer)
-    // console.log(JSON.parse(jsonbufffer))
+    fs.writeFileSync(path.resolve(__dirname, 'file_json/index.json'), stringJson)
+
     ctx.body = stringJson
 })
 
 app.use(router.routes())
 
 app.use(router.allowedMethods())
+app.use(((ctx, next) => {
+    if (ctx.response.status === 404) {
+        const htm = fs.readFileSync('./static/page/404/404.html', 'utf-8')
+        ctx.body = htm
+    } else {
+        next()
+    }
+
+}))
 
 app.listen(4000, () => {
     console.log('5000端口')
